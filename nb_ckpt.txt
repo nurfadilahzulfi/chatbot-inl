@@ -1,0 +1,35 @@
+﻿=== CELL [3] (CONFIG) ===
+---
+## ≡ƒÄ¢∩╕Å MASTER PARAMETER PANEL
+> **Ubah semua hyperparameter di sini sebelum menjalankan pipeline**
+
+=== CELL [21] (CHECKPOINT SAVE) ===
+# ΓöÇΓöÇ Loss function ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+loss_map = {
+    'MSE'  : nn.MSELoss(),
+    'MAE'  : nn.L1Loss(),
+    'Huber': nn.HuberLoss(delta=0.5)
+}
+criterion = loss_map[CONFIG['loss_function']]
+
+# ΓöÇΓöÇ Optimizer ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+opt_map = {
+    'Adam' : torch.optim.Adam,
+    'AdamW': torch.optim.AdamW,
+    'SGD'  : torch.optim.SGD
+}
+optimizer = opt_map[CONFIG['optimizer']](
+    model.parameters(),
+    lr           = CONFIG['learning_rate'],
+    weight_decay = CONFIG['weight_decay']
+)
+
+# ΓöÇΓöÇ LR Scheduler ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+if CONFIG['scheduler_type'] == 'StepLR':
+    scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer, step_size=CONFIG['lr_step_size'], gamma=CONFIG['lr_gamma'])
+elif CONFIG['scheduler_type'] == 'ReduceLROnPlateau':
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', factor=CONFIG['lr_gamma'],
+      
+

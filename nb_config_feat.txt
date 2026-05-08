@@ -1,0 +1,190 @@
+﻿=== CELL [3] ===
+---
+## ≡ƒÄ¢∩╕Å MASTER PARAMETER PANEL
+> **Ubah semua hyperparameter di sini sebelum menjalankan pipeline**
+
+=== CELL [7] ===
+# ΓöÇΓöÇ Parse Indonesian number format ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+def parse_indonesian_number(series: pd.Series) -> pd.Series:
+    """Convert '1.135,75' ΓåÆ 1135.75 (Indonesian locale format)."""
+    return (
+        series.astype(str)
+        .str.replace('.', '', regex=False)   # Remove thousands separator
+        .str.replace(',', '.', regex=False)  # Replace decimal comma
+        .str.replace('%', '', regex=False)   # Remove percent sign
+        .pipe(pd.to_numeric, errors='coerce')
+    )
+
+# ΓöÇΓöÇ Load raw data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+raw = pd.read_csv(csv_path)
+
+# Rename to standard English column names
+raw.columns = ['Date', 'Close', 'Open', 'High', 'Low', 'Volume', 'Pct_Change']
+
+# Parse date (Indonesian DD/MM/YYYY format)
+raw['Date'] = pd.to_datetime(raw['Date'], format='%d/%m/%Y', dayfirst=True)
+
+# Parse numeric columns
+for col in ['Close', 'Open', 'High', 'Low', 'Pct_Change']:
+    raw[col] = parse_indonesian_number(raw[col])
+
+# Sort chronologically (oldest ΓåÆ newest)
+raw = raw.sort_values('Date').reset_index(drop=True)
+raw.drop(columns=['Volume'], inplace=True)  # All null ΓåÆ drop
+
+print(f'≡ƒôè Dataset Shape   : {raw.shape}')
+print(f'≡ƒôà Date Range      : {raw["Date"].min().date()} ΓåÆ {raw["Date"].max().date()}')
+print(f'≡ƒÆ░ Close Price Range: {raw["Close"].min():.2f} ΓÇö {raw["Close"].max():.2f}')
+print(f'\n≡ƒöì Sample (first 5 rows):')
+display(raw.head())
+print(f'\n≡ƒöì Sample (last 5 rows):')
+display(raw.tail())
+print(f'\n≡ƒôï Data Types & Null Check:')
+display(raw.info())
+
+=== CELL [13] ===
+def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Compute all technical indicators as model features."""
+    d = df.copy()
+
+    # ΓöÇΓöÇ Moving Averages ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    d['MA_7']  = d['Close'].rolling(7).mean()
+    d['MA_21'] = d['Close'].rolling(21).mean()
+    d['MA_50'] = d['Close'].rolling(50).mean()
+
+    # ΓöÇΓöÇ Exponential Moving Averages ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    d['EMA_12'] = d['Close'].ewm(span=12, adjust=False).mean()
+    d['EMA_26'] = d['Close'].ewm(span=26, adjust=False).mean()
+
+    # ΓöÇΓöÇ MACD ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    d['MACD']        = d['EMA_12'] - d['EMA_26']
+    d['MACD_Signal'] = d['MACD'].ewm(span=9, adjust=False).mean()
+    d['MACD_Hist']   = d['MACD'] - d['MACD_Signal']
+
+    # ΓöÇΓöÇ RSI (14-period) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    delta = d['Close'].diff()
+    gain  = delta.clip(lower=0).rolling(14).mean()
+    loss  = (-delta.clip(upper=0)).rolling(14).mean()
+    rs    = gain / (loss + 1e-9)
+    d['RSI'] = 100 - (100 / (1 + rs))
+
+    # ΓöÇΓöÇ Bollinger Bands (20-period, 2╧â) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    roll_mean = d['Close'].rolling(20).mean()
+    roll_std  = d['Close'].rolling(20).std()
+    d['Bollinger_Upper'] = roll_mean + 2 * roll_std
+    d['Bollinger_Lower'] = roll_mean - 2 * roll_std
+    d['BB_Width']        = d['Bollinger_Upper'] - d['Bollinger_Lower']
+
+    # ΓöÇΓöÇ Volatility & Momentum ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    d['Volatility_7']  = d['Close'].rolling(7).std()
+    d['Volatility_30'] = d['Close'].rolling(30).std()
+    d['Momentum_5']    = d['Close'].diff(5)
+    d['Momentum_14']   = d['Close'].diff(14)
+
+    # ΓöÇΓöÇ Lag Features ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    for lag in [1, 3, 7]:
+        d[f'Close_Lag_{lag}'] = d['Close'].shift(lag)
+
+    # ΓöÇΓöÇ Price Ratios ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    d['HL_Ratio'] = (d['High'] - d['Low']) / (d['Close'] + 1e-9)
+    d['OC_Ratio'] = (d['Close'] - d['Open']) / (d['Open'] + 1e-9)
+
+    # ΓöÇΓöÇ Calendar Features ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    d['DayOfWeek'] = d['Date'].dt.dayofweek   # 0=Mon ΓÇª 4=Fri
+    d['Month']     = d['Date'].dt.month
+    d['Quarter']   = d['Date'].dt.quarter
+
+    # Update CONFIG feature list to include all generated features
+    return d
+
+df = engineer_features(df)
+
+# Drop rows with NaN (from rolling windows)
+df.dropna(inplace=True)
+df.reset_index(drop=True, inplace=True)
+
+print(f'Γ£à Feature engineering complete.')
+print(f'   Shape after feature engineering: {df.shape}')
+print(f'   Features available: {list(df.columns)}')
+
+=== CELL [16] ===
+# ΓöÇΓöÇ Select features based on CONFIG ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+# Use all available numeric features for maximum signal
+feature_cols = [c for c in df.select_dtypes(include='number').columns
+                if c != 'Close'] + ['Close']
+feature_cols = [c for c in feature_cols if c in df.columns]
+target_idx   = feature_cols.index('Close')
+
+print(f'Γ£à Feature columns used ({len(feature_cols)}): {feature_cols}')
+print(f'   Target column index: {target_idx} ΓåÆ "Close"')
+
+data_array = df[feature_cols].values
+
+# ΓöÇΓöÇ Train / Val / Test Split (temporal ΓÇö no shuffle!) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+n = len(data_array)
+train_end = int(n * CONFIG['train_split'])
+val_end   = int(n * (CONFIG['train_split'] + CONFIG['val_split']))
+
+train_data = data_array[:train_end]
+val_data   = data_array[train_end:val_end]
+test_data  = data_array[val_end:]
+
+print(f'\n≡ƒôè Split Summary (temporal ΓÇö no data leakage):')
+print(f'   Train : {len(train_data):,} rows '
+      f'({df["Date"].iloc[0].date()} ΓåÆ {df["Date"].iloc[train_end-1].date()})')
+print(f'   Val   : {len(val_data):,} rows '
+      f'({df["Date"].iloc[train_end].date()} ΓåÆ {df["Date"].iloc[val_end-1].date()})')
+print(f'   Test  : {len(test_data):,} rows '
+      f'({df["Date"].iloc[val_end].date()} ΓåÆ {df["Date"].iloc[-1].date()})')
+
+# ΓöÇΓöÇ Scaling (fit on train ONLY to prevent leakage) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+scaler_cls = MinMaxScaler if CONFIG['scaler_type'] == 'MinMax' else RobustScaler
+scaler = scaler_cls()
+train_scaled = scaler.fit_transform(train_data)
+val_scaled   = scaler.transform(val_data)
+test_scaled  = scaler.transform(test_data)
+
+# Close-only scaler for inverse transform of predictions
+close_scaler = scaler_cls()
+close_scaler.fit(train_data[:, target_idx].reshape(-1, 1))
+
+print(f'\nΓ£à Scaler: {CONFIG["scaler_type"]}Scaler fitted on train set only.')
+
+# ΓöÇΓöÇ Sequence Builder ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+def build_sequences(scaled_data, seq_len: int, target_col_idx: int):
+    """Build (X, y) pairs where y = next Close price."""
+    X, y = [], []
+    for i in range(len(scaled_data) - seq_len):
+        X.append(scaled_data[i : i + seq_len, :])       # All features
+        y.append(scaled_data[i + seq_len, target_col_idx])  # Target = Close
+    return np.array(X, dtype=np.float32), np.array(y, dtype=np.float32)
+
+SEQ = CONFIG['sequence_length']
+
+# For validation/test we need overlap with previous data to build context
+X_train, y_train = build_sequences(train_scaled, SEQ, target_idx)
+
+# Prepend tail of train to val/test for context continuity
+val_with_context  = np.concatenate([train_scaled[-SEQ:], val_scaled], axis=0)
+test_with_context = np.concatenate([val_scaled[-SEQ:], test_scaled], axis=0)
+
+X_val,  y_val  = build_sequences(val_with_context,  SEQ, target_idx)
+X_test, y_test = build_sequences(test_with_context, SEQ, target_idx)
+
+print(f'\nΓ£à Sequence shape (SEQ_LEN={SEQ})')
+print(f'   X_train: {X_train.shape}, y_train: {y_train.shape}')
+print(f'   X_val  : {X_val.shape},  y_val  : {y_val.shape}')
+print(f'   X_test : {X_test.shape}, y_test : {y_test.shape}')
+
+# ΓöÇΓöÇ DataLoaders ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+def to_loader(X, y, batch_size, shuffle=False):
+    ds = TensorDataset(torch.tensor(X), torch.tensor(y).unsqueeze(1))
+    return DataLoader(ds, batch_size=batch_size, shuffle=shuffle,
+                      pin_memory=DEVICE.type == 'cuda')
+
+BS = CONFIG['batch_size']
+train_loader = to_loader(X_train, y_train, BS, shuffle=True)
+val_loader   = to_loader(X_val,   y_val,   BS)
+test_loader  = to_loader(X_test,  y_test,  BS)
+print('Γ£à Step 4 complete.')
+

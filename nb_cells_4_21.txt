@@ -1,0 +1,189 @@
+﻿=== CELL [4] ===
+# ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+# Γòæ               ≡ƒÄ¢∩╕Å  MASTER PARAMETER CONFIGURATION PANEL                 Γòæ
+# ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+
+CONFIG = {
+    # ΓöÇΓöÇ Data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'target_col'        : 'Close',        # Kolom target prediksi
+    'feature_cols'      : ['Open', 'High', 'Low', 'Close', 'Pct_Change',
+                           'MA_7', 'MA_21', 'EMA_12', 'EMA_26', 'MACD',
+                           'RSI', 'Bollinger_Upper', 'Bollinger_Lower',
+                           'Volatility_7', 'Momentum_5'],  # Semua fitur
+    'train_split'       : 0.80,           # 80% train, 20% test
+    'val_split'         : 0.10,           # 10% dari train ΓåÆ validation
+    'scaler_type'       : 'MinMax',       # 'MinMax' atau 'Robust'
+
+    # ΓöÇΓöÇ Sequence ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'sequence_length'   : 60,             # Lookback window (hari)
+    'forecast_horizon'  : 7,              # Prediksi ke depan (hari)
+
+    # ΓöÇΓöÇ Model Architecture ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'lstm_hidden_size'  : 128,            # Neuron per layer LSTM
+    'lstm_num_layers'   : 3,              # Jumlah layer LSTM (stacked)
+    'dropout_rate'      : 0.3,            # Dropout antar layer
+    'bidirectional'     : False,          # True ΓåÆ BiLSTM (lebih berat)
+    'use_attention'     : True,           # True ΓåÆ tambah attention mechanism
+
+    # ΓöÇΓöÇ Training ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'epochs'            : 100,            # Epoch maksimal
+    'batch_size'        : 32,             # Batch size
+    'learning_rate'     : 0.001,          # Learning rate awal
+    'optimizer'         : 'Adam',         # 'Adam', 'AdamW', 'SGD'
+    'loss_function'     : 'MSE',          # 'MSE', 'MAE', 'Huber'
+    'weight_decay'      : 1e-5,           # L2 regularization
+    'gradient_clip'     : 1.0,            # Gradient clipping max norm
+
+    # ΓöÇΓöÇ Learning Rate Scheduler ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'scheduler_type'    : 'CosineAnnealing',  # 'StepLR', 'ReduceLROnPlateau', 'CosineAnnealing'
+    'lr_step_size'      : 20,             # Untuk StepLR
+    'lr_gamma'          : 0.5,            # Faktor reduksi LR
+    'lr_patience'       : 10,             # Untuk ReduceLROnPlateau
+    'lr_t_max'          : 50,             # Untuk CosineAnnealing
+
+    # ΓöÇΓöÇ Early Stopping ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'early_stopping'    : True,           # Aktifkan early stopping
+    'patience'          : 15,             # Epoch toleransi tanpa improvement
+    'min_delta'         : 1e-6,           # Minimum improvement threshold
+
+    # ΓöÇΓöÇ Outlier Handling ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'outlier_method'    : 'IQR',          # 'IQR', 'ZScore', 'None'
+    'iqr_factor'        : 3.0,            # Faktor IQR (lebih besar = lebih toleran)
+    'zscore_threshold'  : 3.5,            # Z-score threshold
+
+    # ΓöÇΓöÇ Misc ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    'seed'              : 42,
+    'save_model'        : True,           # Simpan model .pth
+}
+
+print('ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù')
+print('Γòæ          ACTIVE CONFIGURATION SUMMARY                Γòæ')
+print('ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥')
+for k, v in CONFIG.items():
+    print(f'  {k:<25} : {v}')
+
+=== CELL [21] ===
+# ΓöÇΓöÇ Loss function ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+loss_map = {
+    'MSE'  : nn.MSELoss(),
+    'MAE'  : nn.L1Loss(),
+    'Huber': nn.HuberLoss(delta=0.5)
+}
+criterion = loss_map[CONFIG['loss_function']]
+
+# ΓöÇΓöÇ Optimizer ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+opt_map = {
+    'Adam' : torch.optim.Adam,
+    'AdamW': torch.optim.AdamW,
+    'SGD'  : torch.optim.SGD
+}
+optimizer = opt_map[CONFIG['optimizer']](
+    model.parameters(),
+    lr           = CONFIG['learning_rate'],
+    weight_decay = CONFIG['weight_decay']
+)
+
+# ΓöÇΓöÇ LR Scheduler ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+if CONFIG['scheduler_type'] == 'StepLR':
+    scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer, step_size=CONFIG['lr_step_size'], gamma=CONFIG['lr_gamma'])
+elif CONFIG['scheduler_type'] == 'ReduceLROnPlateau':
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', factor=CONFIG['lr_gamma'],
+        patience=CONFIG['lr_patience'], verbose=True)
+else:  # CosineAnnealing
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=CONFIG['lr_t_max'])
+
+print(f'Γ£à Optimizer : {CONFIG["optimizer"]} | LR: {CONFIG["learning_rate"]}')
+print(f'Γ£à Loss      : {CONFIG["loss_function"]}')
+print(f'Γ£à Scheduler : {CONFIG["scheduler_type"]}')
+
+# ΓöÇΓöÇ Training Loop ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+class EarlyStopping:
+    def __init__(self, patience: int, min_delta: float):
+        self.patience   = patience
+        self.min_delta  = min_delta
+        self.best_loss  = float('inf')
+        self.counter    = 0
+        self.best_state = None
+
+    def __call__(self, val_loss: float, model: nn.Module) -> bool:
+        if val_loss < self.best_loss - self.min_delta:
+            self.best_loss  = val_loss
+            self.counter    = 0
+            self.best_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
+        else:
+            self.counter += 1
+        return self.counter >= self.patience
+
+early_stop = EarlyStopping(CONFIG['patience'], CONFIG['min_delta'])
+
+train_losses, val_losses, lr_history = [], [], []
+
+print(f'\n≡ƒÅï∩╕Å Training started | Epochs: {CONFIG["epochs"]} | '
+      f'Batch: {CONFIG["batch_size"]} | Device: {DEVICE}')
+print('ΓöÇ' * 65)
+
+for epoch in range(1, CONFIG['epochs'] + 1):
+    # ΓöÇΓöÇ Train ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    model.train()
+    batch_loss = 0.0
+    for X_b, y_b in train_loader:
+        X_b, y_b = X_b.to(DEVICE), y_b.to(DEVICE)
+        optimizer.zero_grad()
+        pred, _ = model(X_b)
+        loss = criterion(pred, y_b)
+        loss.backward()
+        nn.utils.clip_grad_norm_(model.parameters(), CONFIG['gradient_clip'])
+        optimizer.step()
+        batch_loss += loss.item()
+
+    train_loss = batch_loss / len(train_loader)
+
+    # ΓöÇΓöÇ Validate ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    model.eval()
+    val_loss = 0.0
+    with torch.no_grad():
+        for X_b, y_b in val_loader:
+            X_b, y_b = X_b.to(DEVICE), y_b.to(DEVICE)
+            pred, _ = model(X_b)
+            val_loss += criterion(pred, y_b).item()
+    val_loss /= len(val_loader)
+
+    # ΓöÇΓöÇ Scheduler step ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    if CONFIG['scheduler_type'] == 'ReduceLROnPlateau':
+        scheduler.step(val_loss)
+    else:
+        scheduler.step()
+
+    cur_lr = optimizer.param_groups[0]['lr']
+    train_losses.append(train_loss)
+    val_losses.append(val_loss)
+    lr_history.append(cur_lr)
+
+    # ΓöÇΓöÇ Logging ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    if epoch % 10 == 0 or epoch == 1:
+        print(f'  Epoch [{epoch:>4}/{CONFIG["epochs"]}] '
+              f'Train Loss: {train_loss:.6f} | '
+              f'Val Loss: {val_loss:.6f} | LR: {cur_lr:.2e}')
+
+    # ΓöÇΓöÇ Early Stopping ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    if CONFIG['early_stopping'] and early_stop(val_loss, model):
+        print(f'\nΓÜí Early stopping at epoch {epoch} '
+              f'(best val loss: {early_stop.best_loss:.6f})')
+        model.load_state_dict(early_stop.best_state)
+        break
+
+print('ΓöÇ' * 65)
+print(f'Γ£à Training complete! Best Val Loss: {min(val_losses):.6f}')
+
+if CONFIG['save_model']:
+    torch.save({
+        'model_state': model.state_dict(),
+        'config'     : CONFIG,
+        'feature_cols': feature_cols,
+        'target_idx' : target_idx
+    }, 'cpo_lstm_model.pth')
+    print('≡ƒÆ╛ Model saved: cpo_lstm_model.pth')
+

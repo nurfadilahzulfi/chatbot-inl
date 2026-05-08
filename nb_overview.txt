@@ -1,0 +1,63 @@
+﻿Total cells: 31
+[0] markdown: # ≡ƒî┤ CPO (Crude Palm Oil) Price Prediction ΓÇö LSTM Deep Learning **Data Scientist Workflow | End-to-End Time Series Forecasting**  --- **Pipeline Overview:** 1. ≡ƒôÑ Data Loading & Exploration 2. ≡ƒöì Exploratory Data Analysis (EDA) 3. ≡ƒº╣ Preprocessing & Outlier Detection 4. ≡ƒôè Feature Engineering 5. ΓÜÖ∩╕Å Model
+---
+[1] markdown: ## ΓÜÖ∩╕Å Cell 0 ΓÇö Install & Import Dependencies
+---
+[2] code: # ΓöÇΓöÇ Install (Colab may already have most of these) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ !pip install -q scikit-learn pandas numpy matplotlib seaborn torch  import os, warnings, random import numpy as np import pandas as pd import matplotlib.pyplot as plt import matplotlib.dates as mdates import seaborn as sn
+---
+[3] markdown: --- ## ≡ƒÄ¢∩╕Å MASTER PARAMETER PANEL > **Ubah semua hyperparameter di sini sebelum menjalankan pipeline**
+---
+[4] code: # ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù # Γòæ               ≡ƒÄ¢∩╕Å  MASTER PARAMETER CONFIGURATION PANEL                 Γòæ # ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥  CONFIG = {     # ΓöÇΓöÇ Data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+---
+[5] markdown: --- ## ≡ƒôÑ Step 1 ΓÇö Data Loading & Initial Exploration
+---
+[6] code: # ΓöÇΓöÇ Upload CSV ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ print('≡ƒôü Upload file CSV dataset CPO...') uploaded = files.upload() csv_path = list(uploaded.keys())[0] print(f'Γ£à File uploaded: {csv_path}')
+---
+[7] code: # ΓöÇΓöÇ Parse Indonesian number format ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ def parse_indonesian_number(series: pd.Series) -> pd.Series:     """Convert '1.135,75' ΓåÆ 1135.75 (Indonesian locale format)."""     return (         series.astype(str)         .str.replace('.', '', regex=False)   # Remove
+---
+[8] code: # ΓöÇΓöÇ Visualization 1: Raw Price History ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ fig, axes = plt.subplots(2, 2, figsize=(18, 10)) fig.suptitle('≡ƒôÑ Step 1 ΓÇö Raw Data Exploration', fontsize=16,              fontweight='bold', color=PALETTE['primary'], y=1.01)  # 1a. Full price history ax = axes[0, 0] ax
+---
+[9] markdown: --- ## ≡ƒöì Step 2 ΓÇö Outlier Detection & Handling
+---
+[10] code: def detect_outliers_iqr(series: pd.Series, factor: float = 3.0):     Q1, Q3 = series.quantile([0.25, 0.75])     IQR = Q3 - Q1     lower, upper = Q1 - factor * IQR, Q3 + factor * IQR     return series < lower, series > upper, lower, upper  def detect_outliers_zscore(series: pd.Series, threshold: floa
+---
+[11] code: # ΓöÇΓöÇ Visualization 2: Outlier Analysis ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ fig, axes = plt.subplots(2, 3, figsize=(20, 10)) fig.suptitle('≡ƒöì Step 2 ΓÇö Outlier Detection & Distribution Analysis',              fontsize=16, fontweight='bold', color=PALETTE['secondary'])  for i, col in enumerate(['Op
+---
+[12] markdown: --- ## ≡ƒôè Step 3 ΓÇö Feature Engineering
+---
+[13] code: def engineer_features(df: pd.DataFrame) -> pd.DataFrame:     """Compute all technical indicators as model features."""     d = df.copy()      # ΓöÇΓöÇ Moving Averages ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ     d['MA_7']  = d['Close'].rolling(7).mean()     d['MA_21'] = d['Close'].rolling(2
+---
+[14] code: # ΓöÇΓöÇ Visualization 3: Technical Indicators ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ recent = df.tail(365).copy()  # Last year for clarity  fig, axes = plt.subplots(4, 1, figsize=(18, 20), sharex=True) fig.suptitle('≡ƒôè Step 3 ΓÇö Feature Engineering: Technical Indicators',              fontsize=16, fontweig
+---
+[15] markdown: --- ## ≡ƒº╣ Step 4 ΓÇö Preprocessing: Scaling & Sequence Creation
+---
+[16] code: # ΓöÇΓöÇ Select features based on CONFIG ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ # Use all available numeric features for maximum signal feature_cols = [c for c in df.select_dtypes(include='number').columns                 if c != 'Close'] + ['Close'] feature_cols = [c for c in feature_cols if c in d
+---
+[17] code: # ΓöÇΓöÇ Visualization 4: Preprocessing Quality Check ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ fig, axes = plt.subplots(1, 3, figsize=(18, 5)) fig.suptitle('≡ƒº╣ Step 4 ΓÇö Preprocessing Quality Check',              fontsize=16, fontweight='bold', color=PALETTE['green'])  # Train/Val/Test split on Close price timeline 
+---
+[18] markdown: --- ## ≡ƒºá Step 5 ΓÇö LSTM Model Architecture
+---
+[19] code: class AttentionLayer(nn.Module):     """Additive (Bahdanau-style) attention over LSTM hidden states."""     def __init__(self, hidden_size: int):         super().__init__()         self.attn = nn.Linear(hidden_size, 1)      def forward(self, lstm_out: torch.Tensor) -> torch.Tensor:         # lstm_ou
+---
+[20] markdown: --- ## ≡ƒÅï∩╕Å Step 6 ΓÇö Model Training
+---
+[21] code: # ΓöÇΓöÇ Loss function ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ loss_map = {     'MSE'  : nn.MSELoss(),     'MAE'  : nn.L1Loss(),     'Huber': nn.HuberLoss(delta=0.5) } criterion = loss_map[CONFIG['loss_function']]  # ΓöÇΓöÇ Optimizer ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+---
+[22] code: # ΓöÇΓöÇ Visualization 5: Training Diagnostics ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ fig, axes = plt.subplots(1, 3, figsize=(18, 5)) fig.suptitle('≡ƒÅï∩╕Å Step 6 ΓÇö Training Diagnostics',              fontsize=16, fontweight='bold', color=PALETTE['purple'])  epochs_ran = range(1, len(train_losses) + 1)  # Loss
+---
+[23] markdown: --- ## ≡ƒôê Step 7 ΓÇö Evaluation & Model Diagnostics
+---
+[24] code: def predict_all(model, loader, scaler_close, device):     """Run inference on a dataloader, inverse-transform predictions."""     model.eval()     preds_s, trues_s = [], []     with torch.no_grad():         for X_b, y_b in loader:             out, _ = model(X_b.to(device))             preds_s.append
+---
+[25] code: # ΓöÇΓöÇ Visualization 6: Evaluation Dashboard ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ fig = plt.figure(figsize=(20, 16)) fig.suptitle('≡ƒôê Step 7 ΓÇö Model Evaluation Dashboard',              fontsize=16, fontweight='bold', color=PALETTE['primary'])  gs = fig.add_gridspec(3, 3, hspace=0.45, wspace=0.35)  # 7a
+---
+[26] markdown: --- ## ≡ƒö« Step 8 ΓÇö 7-Day Price Forecast
+---
+[27] code: def forecast_n_days(     model: nn.Module,     last_window: np.ndarray,    # Shape: (seq_len, n_features) ΓÇö already scaled     n_days: int,     close_scaler,     all_scaler,     target_idx: int,     device: torch.device,     n_mc_samples: int = 50     # Monte Carlo dropout for uncertainty ) -> dict:
+---
+[28] code: # ΓöÇΓöÇ Visualization 7: Forecast Dashboard ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ context_days = 90 hist_dates   = df['Date'].values[-context_days:] hist_close   = df['Close'].values[-context_days:]  fig, axes = plt.subplots(2, 2, figsize=(20, 12)) fig.suptitle('≡ƒö« Step 8 ΓÇö 7-Day CPO Price Forecast Das
+---
+[29] markdown: --- ## ≡ƒôï Step 9 ΓÇö Summary Report
+---
+[30] code: print('ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù') print('Γòæ              ≡ƒî┤ CPO LSTM FORECASTING ΓÇö FINAL SUMMARY               Γòæ') print('ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥')  print(f'\n≡ƒôè DATASET') print(f'   Rows             : {len
+---

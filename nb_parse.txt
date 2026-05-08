@@ -1,0 +1,45 @@
+﻿=== CELL [7] PARSE ===
+# ΓöÇΓöÇ Parse Indonesian number format ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+def parse_indonesian_number(series: pd.Series) -> pd.Series:
+    """Convert '1.135,75' ΓåÆ 1135.75 (Indonesian locale format)."""
+    return (
+        series.astype(str)
+        .str.replace('.', '', regex=False)   # Remove thousands separator
+        .str.replace(',', '.', regex=False)  # Replace decimal comma
+        .str.replace('%', '', regex=False)   # Remove percent sign
+        .pipe(pd.to_numeric, errors='coerce')
+    )
+
+# ΓöÇΓöÇ Load raw data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+raw = pd.read_csv(csv_path)
+
+# Rename to standard English column names
+raw.columns = ['Date', 'Close', 'Open', 'High', 'Low', 'Volume', 'Pct_Change']
+
+# Parse date (Indonesian DD/MM/YYYY format)
+raw['Date'] = pd.to_datetime(raw['Date'], format='%d/%m/%Y', dayfirst=True)
+
+# Parse numeric columns
+for col in ['Close', 'Open', 'High', 'Low', 'Pct_Change']:
+    raw[col] = parse_indonesian_number(raw[col])
+
+# Sort chronologically (oldest ΓåÆ newest)
+raw = raw.sort_values('Date').reset_index(drop=True)
+raw.drop(columns=['Volume'], inplace=True)  # All null ΓåÆ drop
+
+print(f'≡ƒôè Dataset Shape   : {raw.shape}')
+print(f'≡ƒôà Date Range      : {raw["Date"].min().date()} ΓåÆ {raw["Date"].max().date()}')
+print(f'≡ƒÆ░ Close Price Range: {raw["Close"].min():.2f} ΓÇö {raw["Close"].max():.2f}')
+print(f'\n≡ƒöì Sample (first 5 rows):')
+display(raw.head())
+print(f'\n≡ƒöì Sample (last 5 rows):')
+display(raw.tail())
+print(f'\n≡ƒôï Data Types & Null Check:')
+display(raw.info())
+
+=== CELL [6] DATA LOAD ===
+# ΓöÇΓöÇ Upload CSV ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+print('≡ƒôü Upload file CSV dataset CPO...')
+uploaded = files.upload()
+csv_path = list(uploaded.keys())[0]
+print(f'Γ£à File uploaded: {csv_path}')
