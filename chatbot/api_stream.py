@@ -145,7 +145,11 @@ app.add_middleware(
 # Dipanggil SEKALI saat startup, hasilnya di-cache
 # ─────────────────────────────────────────────────────────────────────────────
 def _build_chart_payload(forecast_result: dict) -> dict:
-    """Konversi forecast() result → format Chart.js untuk /forecast-data."""
+    """Konversi forecast() result → format Chart.js untuk /forecast-data.
+
+    Sekarang juga menyertakan data backtest (prediksi vs aktual pada
+    periode historis) agar grafik bisa menampilkan overlay kedua garis.
+    """
     if not bot or not bot.price_data:
         return {"status": "no_data", "categories": [], "actual": [], "prediction": []}
 
@@ -157,8 +161,13 @@ def _build_chart_payload(forecast_result: dict) -> dict:
     lower_50     = [f["lower_50"]         for f in forecasts]
     upper_50     = [f["upper_50"]         for f in forecasts]
 
-    display_days  = 30
-    last_n        = bot.price_data[-display_days:]
+    # Tampilkan semua data aktual dari tahun 2025 ke atas
+    from datetime import datetime
+    cutoff_date = datetime(2025, 1, 1)
+    last_n        = [item for item in bot.price_data if item['date'] >= cutoff_date]
+    if not last_n:
+        # Fallback ke 30 hari terakhir jika belum ada data 2025
+        last_n = bot.price_data[-30:]
     dates_actual  = [item['date_str'] for item in last_n]
     prices_actual = [item['price']    for item in last_n]
     n_actual      = len(prices_actual)
@@ -175,6 +184,25 @@ def _build_chart_payload(forecast_result: dict) -> dict:
     final_lower_50   = bridge + lower_50
     final_upper_50   = bridge + upper_50
 
+    # ── Backtest overlay: prediksi model di area historis ──────────────────
+    # Buat array backtest_predicted yang sejajar dgn final_categories
+    # Hanya isi di tanggal yang ada di backtest, sisanya None
+    backtest_overlay = [None] * len(final_categories)
+    if cpo_pipeline and cpo_pipeline.backtest_dates:
+        bt_map = dict(zip(cpo_pipeline.backtest_dates, cpo_pipeline.backtest_predicted))
+        for i, dt in enumerate(final_categories):
+            if dt in bt_map:
+                backtest_overlay[i] = bt_map[dt]
+
+    # Data backtest mentah (untuk grafik terpisah jika dibutuhkan)
+    backtest_raw = {}
+    if cpo_pipeline and cpo_pipeline.backtest_dates:
+        backtest_raw = {
+            "dates"     : cpo_pipeline.backtest_dates,
+            "actual"    : cpo_pipeline.backtest_actual,
+            "predicted" : cpo_pipeline.backtest_predicted,
+        }
+
     return {
         "status"     : "ok",
         "categories" : final_categories,
@@ -186,6 +214,9 @@ def _build_chart_payload(forecast_result: dict) -> dict:
         "upper_50"   : final_upper_50,
         "last_known" : forecast_result["last_known_price"],
         "mc_samples" : forecast_result["mc_samples_used"],
+        # Backtest overlay — prediksi model pada tanggal historis
+        "backtest_overlay" : backtest_overlay,
+        "backtest"         : backtest_raw,
     }
 
 

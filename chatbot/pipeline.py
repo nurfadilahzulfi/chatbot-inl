@@ -36,7 +36,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "lstm_hidden_size"  : 128,
     "lstm_num_layers"   : 2,
     "dropout_rate"      : 0.3,
-    "bidirectional"     : True,
+    "bidirectional"     : False,
     "use_attention"     : True,
     # Training — identik notebook
     "epochs"            : 200,
@@ -122,6 +122,10 @@ class CPOPipeline:
         self._last_close  : Optional[float]          = None
         self._last_date   : Optional[str]            = None
         self._df          : Optional[pd.DataFrame]   = None
+        # Backtest: prediksi vs aktual pada test set (untuk overlay chart)
+        self.backtest_dates     : list                = []
+        self.backtest_actual    : list                = []
+        self.backtest_predicted : list                = []
 
     # ─────────────────────────────────────────────────────────────────────────
     #  Public API
@@ -221,6 +225,26 @@ class CPOPipeline:
             f"MAPE={self.metrics['test']['mape']:.2f}% "
             f"R²={self.metrics['test']['r2']:.4f} "
             f"DA={self.metrics['test']['directional_accuracy']:.2f}%"
+        )
+
+        # ── Backtest: simpan prediksi vs aktual pada test set ─────────────────
+        # Test sequences dibangun dari concat([val[-SEQ:], test_scaled]).
+        # _build_sequences: y[i] = concat[i+SEQ] = test_scaled[i]
+        # Jadi y[0] → data_array[val_end], y[i] → data_array[val_end + i]
+        # Tanggal: df["Date"].iloc[val_end + i]
+        test_date_start = val_end  # posisi pertama test di df asli
+        n_test = len(test_preds)
+        self.backtest_dates = [
+            str(df["Date"].iloc[test_date_start + i].date())
+            for i in range(n_test)
+            if (test_date_start + i) < len(df)
+        ]
+        self.backtest_actual    = [round(float(v), 2) for v in test_trues[:len(self.backtest_dates)]]
+        self.backtest_predicted = [round(float(v), 2) for v in test_preds[:len(self.backtest_dates)]]
+        logger.info(
+            f"📊 Backtest saved: {len(self.backtest_dates)} data points "
+            f"({self.backtest_dates[0] if self.backtest_dates else '?'} → "
+            f"{self.backtest_dates[-1] if self.backtest_dates else '?'})"
         )
 
         # ── Last window — identik notebook Step 8: full_scaled[-SEQ:] ────────
