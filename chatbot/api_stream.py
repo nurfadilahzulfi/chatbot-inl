@@ -60,14 +60,14 @@ _chart_cache:    Optional[dict] = None   # hasil yang sudah diformat untuk chart
 async def lifespan(app: FastAPI):
     global bot, cpo_pipeline
 
-    logger.info("🚀 Memulai sistem CPO Chatbot + LSTM Pipeline...")
+    logger.info("Memulai sistem CPO Chatbot + LSTM Pipeline...")
 
     # 1. Inisialisasi chatbot (load CSV, FAQ, dll)
     try:
         bot = SmartChatbot()
-        logger.info("✅ SmartChatbot siap.")
+        logger.info("SmartChatbot siap.")
     except Exception as e:
-        logger.error(f"❌ Gagal inisialisasi chatbot: {e}")
+        logger.error(f"Gagal inisialisasi chatbot: {e}")
         bot = None
 
     # 2. Train CPOPipeline dari RAW CSV (bukan build_ohlc_dataframe yang sudah di-parse)
@@ -75,7 +75,7 @@ async def lifespan(app: FastAPI):
     #    parsing angka Indonesia tidak dilakukan dua kali (double-parse bug)
     if bot and bot.price_data:
         try:
-            logger.info("🧠 Memulai training CPOPipeline (pipeline.py)...")
+            logger.info("Memulai training CPOPipeline (pipeline.py)...")
 
             # Baca CSV langsung — pipeline akan parse sendiri via _load_and_clean()
             import pandas as pd
@@ -84,7 +84,7 @@ async def lifespan(app: FastAPI):
                 df_raw = pd.read_csv(FILE_CSV, encoding='utf-8-sig')
             except UnicodeDecodeError:
                 df_raw = pd.read_csv(FILE_CSV, encoding='latin-1')
-            logger.info(f"📁 Raw CSV dimuat: {df_raw.shape[0]} baris, kolom: {list(df_raw.columns)}")
+            logger.info(f"Raw CSV dimuat: {df_raw.shape[0]} baris, kolom: {list(df_raw.columns)}")
 
 
             cpo_pipeline = CPOPipeline()
@@ -96,23 +96,23 @@ async def lifespan(app: FastAPI):
             # ── PRE-COMPUTE FORECAST CACHE ────────────────────────────────────
             # Hitung SEKALI, simpan hasilnya → grafik & chatbot pakai hasil SAMA
             global _forecast_cache, _chart_cache
-            logger.info("🔮 Pre-computing forecast cache (100 MC samples)...")
+            logger.info("Pre-computing forecast cache (100 MC samples)...")
             _forecast_cache = cpo_pipeline.forecast(horizon=7, n_mc_samples=100)
             _chart_cache    = _build_chart_payload(_forecast_cache)
-            logger.info(f"✅ Forecast cache siap. "
+            logger.info(f"Forecast cache siap. "
                         f"Last known: ${_forecast_cache['last_known_price']:.2f}, "
                         f"Day-1 pred: ${_forecast_cache['forecasts'][0]['predicted_price']:.2f}")
-            logger.info("✅ CPOPipeline training selesai & di-inject ke chatbot.")
+            logger.info("CPOPipeline training selesai & di-inject ke chatbot.")
         except Exception as e:
-            logger.error(f"❌ CPOPipeline training gagal: {e}")
+            logger.error(f"CPOPipeline training gagal: {e}")
             import traceback; traceback.print_exc()
             cpo_pipeline = None
     else:
-        logger.warning("⚠️  Tidak ada data harga — pipeline tidak aktif.")
+        logger.warning("Tidak ada data harga — pipeline tidak aktif.")
 
 
     yield
-    logger.info("🛑 Server shutting down.")
+    logger.info("Server shutting down.")
 
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
@@ -315,8 +315,8 @@ def get_status():
         "input_features"  : cpo_pipeline.n_features if pipeline_ok else 0,
         "total_params"    : cpo_pipeline.total_params if pipeline_ok else 0,
         "metrics_available": cpo_pipeline.metrics is not None if pipeline_ok else False,
-        "message"         : "✅ Sistem siap" if (chatbot_ok and pipeline_ok)
-                            else "⚠️  Sistem belum sepenuhnya siap",
+        "message"         : "Sistem siap" if (chatbot_ok and pipeline_ok)
+                            else "Sistem belum sepenuhnya siap",
     }
 
 

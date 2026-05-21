@@ -58,19 +58,19 @@ def _get_or_build_cache() -> tuple:
 
         # Cache kosong / kedaluwarsa → hitung ulang
         print(f"\n{'='*55}")
-        print(f"🔄 MEMBANGUN CACHE — {_now()}")
+        print(f"MEMBANGUN CACHE — {_now()}")
         print(f"{'='*55}")
 
         t0 = time.time()
 
         df = load_and_preprocess()
-        print(f"  ✅ Data loaded         : {len(df)} bulan")
+        print(f"Data loaded         : {len(df)} bulan")
 
         fi_raw = run_feature_importance(df)
-        print(f"  ✅ Feature importance  : selesai")
+        print(f"Feature importance  : selesai")
 
         _, y_pred, metrik = run_loocv(df)
-        print(f"  ✅ LOOCV selesai       : R²={metrik['r2']}  MAPE={metrik['mape']}%")
+        print(f"LOOCV selesai       : R²={metrik['r2']}  MAPE={metrik['mape']}%")
 
         elapsed = round(time.time() - t0, 1)
         _cache.update({
@@ -82,7 +82,7 @@ def _get_or_build_cache() -> tuple:
         })
 
         exp_time = datetime.fromtimestamp(now + CACHE_TTL).strftime("%H:%M:%S")
-        print(f"  ✅ Cache tersimpan     : valid hingga {exp_time} (waktu komputasi: {elapsed}s)")
+        print(f"Cache tersimpan     : valid hingga {exp_time} (waktu komputasi: {elapsed}s)")
         print(f"{'='*55}\n")
 
         return df, fi_raw, y_pred, metrik
@@ -96,13 +96,13 @@ def _get_or_build_cache() -> tuple:
 async def lifespan(app: FastAPI):
     """Pre-compute cache saat server pertama kali dijalankan."""
     import asyncio
-    print("\n🔥 [STARTUP] Pre-computing RF model — harap tunggu...")
+    print("\n[STARTUP] Pre-computing RF model — harap tunggu...")
     loop = asyncio.get_event_loop()
     try:
         await loop.run_in_executor(None, _get_or_build_cache)
-        print("✅ [STARTUP] Cache warm — semua endpoint siap digunakan!\n")
+        print("[STARTUP] Cache warm — semua endpoint siap digunakan!\n")
     except Exception as e:
-        print(f"⚠️  [STARTUP] Gagal pre-compute cache: {e}\n")
+        print(f"[STARTUP] Gagal pre-compute cache: {e}\n")
     yield
 
 
@@ -178,7 +178,7 @@ def _build_historis(df, y_pred: np.ndarray) -> list[BulanHistoris]:
 )
 def rf_analysis():
     try:
-        print(f"\n📥 [/rf-analysis] {_now()}")
+        print(f"\n[/rf-analysis] {_now()}")
         df, fi_raw, y_pred, metrik = _get_or_build_cache()
 
         payload = RFAnalysisResponse(
@@ -188,7 +188,7 @@ def rf_analysis():
             feature_importance = _build_fi_list(fi_raw),
             historis           = _build_historis(df, y_pred),
         )
-        print(f"  ✅ Response dikirim ke client — {_now()}")
+        print(f"Response dikirim ke client — {_now()}")
         return payload
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
@@ -209,7 +209,7 @@ def rf_analysis():
 )
 def rf_feature_importance():
     try:
-        print(f"\n📥 [/rf-feature-importance] {_now()}")
+        print(f"\n[/rf-feature-importance] {_now()}")
         df, fi_raw, _, _ = _get_or_build_cache()
 
         payload = RFFeatureImportanceResponse(
@@ -218,7 +218,7 @@ def rf_feature_importance():
             jumlah_data        = len(df),
             feature_importance = _build_fi_list(fi_raw),
         )
-        print(f"  ✅ Response dikirim ke client — {_now()}")
+        print(f"Response dikirim ke client — {_now()}")
         return payload
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
@@ -239,7 +239,7 @@ def rf_feature_importance():
 )
 def rf_production_history():
     try:
-        print(f"\n📥 [/rf-production-history] {_now()}")
+        print(f"\n[/rf-production-history] {_now()}")
         df, _, y_pred, metrik = _get_or_build_cache()
 
         payload = RFHistorisResponse(
@@ -254,7 +254,7 @@ def rf_production_history():
             is_imputed     = df["stok_imputed"].tolist(),
             evaluasi       = _build_evaluasi(metrik),
         )
-        print(f"  ✅ Response dikirim ke client — {_now()}")
+        print(f"Response dikirim ke client — {_now()}")
         return payload
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
@@ -317,7 +317,7 @@ def rf_health():
 def rf_invalidate_cache():
     with _cache_lock:
         _cache.clear()
-    print(f"\n🗑️  [/rf-invalidate-cache] Cache dihapus — {_now()}")
+    print(f"\n[/rf-invalidate-cache] Cache dihapus — {_now()}")
     return {
         "status"  : "success",
         "message" : "Cache dihapus. Request berikutnya akan hitung ulang model.",

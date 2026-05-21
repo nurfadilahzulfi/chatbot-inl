@@ -12,7 +12,7 @@ class FAQHandler:
         self._load_data()
 
     def _load_data(self):
-        print("📚 Memuat Knowledge Base (Keyword Boost Enabled)...")
+        print("Memuat Knowledge Base (Keyword Boost Enabled)...")
         if os.path.exists(self.file_path):
             try:
                 self.model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -25,11 +25,11 @@ class FAQHandler:
                 
                 if self.text_chunks:
                     self.doc_embeddings = self.model.encode(self.text_chunks)
-                    print(f"✅ Loaded {len(self.text_chunks)} blocks.")
+                    print(f"Loaded {len(self.text_chunks)} blocks.")
                 else:
-                    print("⚠️ File FAQ kosong.")
+                    print("File FAQ kosong.")
             except Exception as e:
-                print(f"❌ Gagal memuat FAQ: {e}")
+                print(f"Gagal memuat FAQ: {e}")
 
     def search(self, query, top_k=5): # Default top_k kita naikkan jadi 5
         if self.doc_embeddings is None or not self.text_chunks:

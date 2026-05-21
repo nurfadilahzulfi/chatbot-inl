@@ -68,10 +68,10 @@ def _fetch_api(url: str, nama: str) -> list | None:
         resp.raise_for_status()
         data    = resp.json()
         records = data["data"] if isinstance(data, dict) and "data" in data else data
-        print(f"  ✅ [API] {nama:20s} → {len(records):>5} records")
+        print(f"[API] {nama:20s} → {len(records):>5} records")
         return records
     except Exception as e:
-        print(f"  ⚠️  [API] {nama} gagal: {e}")
+        print(f"[API] {nama} gagal: {e}")
         return None
 
 
@@ -85,16 +85,16 @@ def _load_json(path: str, nama: str) -> list | None:
     Return list records jika file ada, None jika tidak.
     """
     if not os.path.exists(path):
-        print(f"  ⚠️  [JSON] {nama} tidak ditemukan di: {path}")
+        print(f"[JSON] {nama} tidak ditemukan di: {path}")
         return None
     try:
         with open(path, "r", encoding="utf-8") as f:
             raw = json.load(f)
         records = raw["data"] if isinstance(raw, dict) and "data" in raw else raw
-        print(f"  ✅ [JSON] {nama:20s} → {len(records):>5} records")
+        print(f"[JSON] {nama:20s} → {len(records):>5} records")
         return records
     except Exception as e:
-        print(f"  ❌ [JSON] {nama} error: {e}")
+        print(f"[JSON] {nama} error: {e}")
         return None
 
 
@@ -105,7 +105,7 @@ def _get_records(url: str, json_path: str, nama: str) -> list:
     """
     records = _fetch_api(url, nama)
     if records is None:
-        print(f"  🔄 Fallback ke JSON lokal untuk {nama}...")
+        print(f"Fallback ke JSON lokal untuk {nama}...")
         records = _load_json(json_path, nama)
     if records is None:
         raise RuntimeError(
@@ -260,7 +260,7 @@ def _extract_excel_month(filepath: str) -> dict | None:
             "sumber"          : "excel",
         }
     except Exception as e:
-        print(f"  ❌ [Excel] {os.path.basename(filepath)}: {e}")
+        print(f"[Excel] {os.path.basename(filepath)}: {e}")
         return None
 
 
@@ -270,21 +270,21 @@ def _load_excel_historis(excel_dir: str) -> pd.DataFrame:
     Return DataFrame kosong jika folder tidak ada atau tidak ada file.
     """
     if not os.path.isdir(excel_dir):
-        print(f"  ℹ️  Folder Excel tidak ditemukan: {excel_dir} — dilewati")
+        print(f"Folder Excel tidak ditemukan: {excel_dir} — dilewati")
         return pd.DataFrame()
 
     excel_files = sorted(glob.glob(os.path.join(excel_dir, "*.xlsx")))
     if not excel_files:
-        print(f"  ℹ️  Tidak ada file .xlsx di {excel_dir} — dilewati")
+        print(f"Tidak ada file .xlsx di {excel_dir} — dilewati")
         return pd.DataFrame()
 
-    print(f"  📊 Memproses {len(excel_files)} file Excel...")
+    print(f"Memproses {len(excel_files)} file Excel...")
     rows = []
     for fpath in excel_files:
         result = _extract_excel_month(fpath)
         if result:
             rows.append(result)
-            print(f"     ✅ {result['bulan']} | "
+            print(f"{result['bulan']} | "
                   f"RBDPO: {result['realisasi_rbdpo']:>15,.0f} | "
                   f"Hari: {result['hari_olah']:>4}")
 
@@ -294,7 +294,7 @@ def _load_excel_historis(excel_dir: str) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     df["bulan"] = pd.to_datetime(df["bulan"])
     df = df.sort_values("bulan").drop_duplicates("bulan").reset_index(drop=True)
-    print(f"  ✅ [Excel] {len(df)} bulan historis "
+    print(f"[Excel] {len(df)} bulan historis "
           f"({df['bulan'].min().strftime('%b %Y')} – "
           f"{df['bulan'].max().strftime('%b %Y')})")
     return df
@@ -427,10 +427,10 @@ def load_and_preprocess() -> pd.DataFrame:
         df_excel["target_rkap"] = median_target
 
         df_all = pd.concat([df_excel, df_api], ignore_index=True)
-        print(f"\n  ✅ Gabungan: {len(df_excel)} bln Excel + {len(df_api)} bln API")
+        print(f"\nGabungan: {len(df_excel)} bln Excel + {len(df_api)} bln API")
     else:
         df_all = df_api.copy()
-        print(f"\n  ℹ️  Hanya data API: {len(df_api)} bulan")
+        print(f"\nHanya data API: {len(df_api)} bulan")
 
     df_all = (
         df_all
@@ -469,7 +469,7 @@ def load_and_preprocess() -> pd.DataFrame:
     n_imputed = int(df_all["stok_imputed"].sum())
 
     print(f"\n{'='*55}")
-    print(f"✅ DATASET SIAP")
+    print(f"DATASET SIAP")
     print(f"{'='*55}")
     print(f"   Total bulan    : {n_total}")
     print(f"   Dari Excel     : {n_excel} bulan (2021–2023)")

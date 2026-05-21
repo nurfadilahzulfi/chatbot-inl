@@ -26,7 +26,7 @@ try:
     from forecast_handler import CPOForecaster
     from price_analytics import PriceAnalyzer
 except ImportError as e:
-    print(f"❌ ERROR: Gagal memuat modul pendukung: {e}")
+    print(f"ERROR: Gagal memuat modul pendukung: {e}")
     sys.exit(1)
 
 # === SETUP OLLAMA ===
@@ -47,7 +47,7 @@ def parse_indonesian_number(s: str) -> float:
 
 class SmartChatbot:
     def __init__(self):
-        print(f"🚀 Membangun Kecerdasan Sobat INL (Model: {MODEL_NAME})...")
+        print(f"Membangun Kecerdasan Sobat INL (Model: {MODEL_NAME})...")
         self.price_data = []
         self._load_database()
 
@@ -62,14 +62,14 @@ class SmartChatbot:
     def set_pipeline(self, pipeline):
         """Inject CPOPipeline setelah training selesai di api_stream.py."""
         self.pipeline = pipeline
-        print("✅ CPOPipeline berhasil di-inject ke SmartChatbot.")
+        print("CPOPipeline berhasil di-inject ke SmartChatbot.")
 
 
     def _load_database(self):
         """Membaca CSV Data Historis Minyak Sawit AS Berjangka."""
-        print("📂 Sedang membaca database CSV...")
+        print("Sedang membaca database CSV...")
         if not os.path.exists(FILE_CSV):
-            print(f"❌ File CSV tidak ditemukan: {FILE_CSV}")
+            print(f"File CSV tidak ditemukan: {FILE_CSV}")
             return
 
         try:
@@ -113,17 +113,17 @@ class SmartChatbot:
                         continue
 
             self.price_data.sort(key=lambda x: x['date'])
-            print(f"✅ Berhasil memuat {len(self.price_data)} baris data harga.")
+            print(f"Berhasil memuat {len(self.price_data)} baris data harga.")
 
             if self.price_data:
                 self.min_date = self.price_data[0]['date']
                 self.max_date = self.price_data[-1]['date']
-                print(f"   📅 Range Data: {self.min_date.year} s/d {self.max_date.year}")
-                print(f"   💰 Harga terakhir: USD {self.price_data[-1]['price']:.2f}/MT "
+                print(f"Range Data: {self.min_date.year} s/d {self.max_date.year}")
+                print(f"Harga terakhir: USD {self.price_data[-1]['price']:.2f}/MT "
                       f"({self.price_data[-1]['date_str']})")
 
         except Exception as e:
-            print(f"⚠️ Gagal membaca dataset CSV: {e}")
+            print(f"Gagal membaca dataset CSV: {e}")
 
     def preprocess_prices(self):
         """Kembalikan DataFrame harga Close yang sudah di-resample & interpolasi."""
@@ -223,7 +223,7 @@ class SmartChatbot:
         min_date = next(p['date'] for p in filtered if p['price'] == min_price)
 
         return f"""
-        📊 STATISTIK PERIODE ({period_label}):
+        STATISTIK PERIODE ({period_label}):
         - Harga Tertinggi: USD {max_price:.2f}/MT (pada {self.format_date_indo(max_date)})
         - Harga Terendah: USD {min_price:.2f}/MT (pada {self.format_date_indo(min_date)})
         - Rata-rata     : USD {avg_price:.2f}/MT

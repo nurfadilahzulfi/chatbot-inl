@@ -106,7 +106,7 @@ class CPOPipeline:
         self.config = {**DEFAULT_CONFIG, **(config_override or {})}
         self._set_seed(self.config["seed"])
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        logger.info(f"🖥️  Device: {self.device}")
+        logger.info(f"Device: {self.device}")
 
         # State — diisi setelah train()
         self.model        : Optional[CPO_LSTM]      = None
@@ -133,7 +133,7 @@ class CPOPipeline:
 
     def train(self, df_raw: pd.DataFrame) -> dict:
         """Full training pipeline. Returns summary dict."""
-        logger.info("🔄 Starting training pipeline...")
+        logger.info("Starting training pipeline...")
 
         df = self._load_and_clean(df_raw)
         df = self._handle_outliers(df)
@@ -161,7 +161,7 @@ class CPOPipeline:
         val_data   = data_array[train_end:val_end]
         test_data  = data_array[val_end:]
         logger.info(
-            f"📊 Split: train={len(train_data)}, "
+            f"Split: train={len(train_data)}, "
             f"val={len(val_data)}, test={len(test_data)}"
         )
 
@@ -207,7 +207,7 @@ class CPOPipeline:
         self.total_params = sum(
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
-        logger.info(f"🧠 Model params: {self.total_params:,} | Features: {self.n_features}")
+        logger.info(f"Model params: {self.total_params:,} | Features: {self.n_features}")
 
         # ── Training — identik notebook Step 6 ───────────────────────────────
         result = self._train_loop(train_loader, val_loader)
@@ -220,7 +220,7 @@ class CPOPipeline:
             "test"       : self._compute_metrics(test_trues, test_preds),
         }
         logger.info(
-            f"📈 Test — MAE={self.metrics['test']['mae']:.4f} "
+            f"Test — MAE={self.metrics['test']['mae']:.4f} "
             f"RMSE={self.metrics['test']['rmse']:.4f} "
             f"MAPE={self.metrics['test']['mape']:.2f}% "
             f"R²={self.metrics['test']['r2']:.4f} "
@@ -242,7 +242,7 @@ class CPOPipeline:
         self.backtest_actual    = [round(float(v), 2) for v in test_trues[:len(self.backtest_dates)]]
         self.backtest_predicted = [round(float(v), 2) for v in test_preds[:len(self.backtest_dates)]]
         logger.info(
-            f"📊 Backtest saved: {len(self.backtest_dates)} data points "
+            f"Backtest saved: {len(self.backtest_dates)} data points "
             f"({self.backtest_dates[0] if self.backtest_dates else '?'} → "
             f"{self.backtest_dates[-1] if self.backtest_dates else '?'})"
         )
@@ -254,7 +254,7 @@ class CPOPipeline:
         self._last_date   = str(df["Date"].iloc[-1].date())
 
         self.is_trained = True
-        logger.info("✅ Training complete!")
+        logger.info("Training complete!")
 
         return {
             "epochs_trained": result["epochs_trained"],
@@ -647,7 +647,7 @@ class CPOPipeline:
             # ── Early stopping — restore best state, tidak simpan ke disk ─────
             if cfg["early_stopping"] and early_stop(val_loss, model):
                 logger.info(
-                    f"⚡ Early stopping at epoch {epoch} "
+                    f"Early stopping at epoch {epoch} "
                     f"(best val: {early_stop.best_loss:.6f})"
                 )
                 model.load_state_dict(early_stop.best_state)  # restore in-memory
