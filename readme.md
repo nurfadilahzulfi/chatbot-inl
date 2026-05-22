@@ -106,7 +106,7 @@ Input (batch, seq_len=20, n_features=28+)
 | Sequence Length | 20 |
 | Hidden Size | 128 |
 | Num Layers | 2 |
-| Bidirectional | True |
+| Bidirectional | False |
 | Attention | True |
 | Epochs | 200 (max) |
 | Batch Size | 64 |
