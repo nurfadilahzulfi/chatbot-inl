@@ -25,6 +25,7 @@ try:
     from faq_handler import FAQHandler
     from forecast_handler import CPOForecaster
     from price_analytics import PriceAnalyzer
+    from production_analyzer import ProductionAnalyzer
 except ImportError as e:
     print(f"ERROR: Gagal memuat modul pendukung: {e}")
     sys.exit(1)
@@ -57,12 +58,22 @@ class SmartChatbot:
         # (lihat SmartChatbot.set_pipeline)
         self.pipeline = None
 
+        # production_analyzer di-inject dari api_stream.py setelah RF data dimuat
+        # (lihat SmartChatbot.set_rf_data)
+        self.production_analyzer = None
+
         self.analyzer = PriceAnalyzer(self.price_data)
 
     def set_pipeline(self, pipeline):
         """Inject CPOPipeline setelah training selesai di api_stream.py."""
         self.pipeline = pipeline
         print("CPOPipeline berhasil di-inject ke SmartChatbot.")
+
+    def set_rf_data(self, rf_data: dict):
+        """Inject data RF production setelah fetch dari rf_api.py berhasil."""
+        self.production_analyzer = ProductionAnalyzer(rf_data)
+        n_bulan = len(rf_data.get("historis", []))
+        print(f"ProductionAnalyzer berhasil di-inject: {n_bulan} bulan data produksi.")
 
 
     def _load_database(self):
@@ -168,6 +179,9 @@ class SmartChatbot:
 
     def _classify_intent(self, query):
         q_clean = query.lower()
+        # PRODUCTION diperiksa lebih awal sebelum FORECAST & ANALYSIS
+        # agar kata kunci seperti "produksi", "rkap", "yield" tidak salah terklasifikasi
+        if self._check_keyword_match(q_clean, "PRODUCTION"): return "PRODUCTION"
         if self._check_keyword_match(q_clean, "FORECAST"):   return "FORECAST"
         if self._check_keyword_match(q_clean, "INFO_COMPANY"): return "INFO_COMPANY"
 
@@ -292,7 +306,25 @@ class SmartChatbot:
         instruction = "Jawab dengan ramah sebagai Sobat INL."
 
         # 4. LOGIC EXECUTION
-        if intent == "FORECAST":
+        if intent == "PRODUCTION":
+            if not self.production_analyzer:
+                return (
+                    "Maaf, data produksi RBDPO belum tersedia saat ini. "
+                    "Pastikan server RF Production (port 3001) sudah berjalan "
+                    "sebelum memulai server chatbot ini."
+                )
+            try:
+                context = self.production_analyzer.analyze(raw_q)
+                instruction = (
+                    "Jawab pertanyaan user berdasarkan data produksi RBDPO yang tersedia. "
+                    "Gunakan satuan ton untuk volume produksi. "
+                    "Sebutkan angka secara spesifik dan berikan analisis singkat apakah "
+                    "kinerja produksi baik atau perlu ditingkatkan."
+                )
+            except Exception as e:
+                return f"Maaf, gagal menganalisis data produksi: {e}"
+
+        elif intent == "FORECAST":
             if not self.pipeline or not self.pipeline.is_trained:
                 return "Maaf, modul prediksi sedang dipersiapkan. Silakan coba beberapa saat lagi."
 

@@ -70,6 +70,41 @@ DOMAIN_TERMS = {
 # 4. INTENT KEYWORDS (DIHALUSKAN & DIPERLUAS)
 # ==========================================
 INTENT_KEYWORDS = {
+    # ── Intent produksi RBDPO (Random Forest) ──────────────────────────────
+    "PRODUCTION": [
+        # Produk & realisasi
+        "produksi", "realisasi", "rbdpo", "produk sawit",
+        "output pabrik", "hasil produksi", "volume produksi",
+        "throughput", "kapasitas produksi",
+
+        # Target & capaian
+        "target", "rkap", "capaian", "pencapaian",
+        "tercapai", "tidak tercapai", "melebihi target", "kurang dari target",
+        "sesuai target",
+
+        # Operasional pabrik
+        "hari olah", "running days", "cpo consume", "cpo dikonsumsi",
+        "yield", "yield rbdpo", "pfad", "stok cpo", "stok bahan",
+
+        # Model & analitik
+        "akurasi produksi", "performa model", "prediksi produksi",
+        "random forest", "feature importance", "faktor produksi",
+        "paling berpengaruh", "variabel penting", "determinan produksi",
+        "loocv", "mape produksi", "error prediksi",
+
+        # Temporal produksi
+        "produksi bulan", "produksi januari", "produksi februari",
+        "produksi maret", "produksi april", "produksi mei", "produksi juni",
+        "produksi juli", "produksi agustus", "produksi september",
+        "produksi oktober", "produksi november", "produksi desember",
+
+        # Frasa alami
+        "berapa produksi", "produksi berapa", "berapa rbdpo",
+        "gimana produksinya", "update produksi", "info produksi",
+        "laporan produksi", "data produksi", "rekap produksi",
+        "produksi kita", "produksi pabrik", "produksi inl",
+    ],
+
     "FORECAST": [
         # Formal
         "prediksi", "forecast", "ramalan", "estimasi", "proyeksi",

@@ -54,6 +54,8 @@ cpo_pipeline: Optional[CPOPipeline] = None
 # Ini memastikan grafik dashboard dan chatbot menampilkan hasil yang SAMA
 _forecast_cache: Optional[dict] = None   # hasil forecast(horizon=7)
 _chart_cache:    Optional[dict] = None   # hasil yang sudah diformat untuk chart
+# Cache data RF production — di-fetch dari rf_api.py (port 3001) saat startup
+_rf_cache:       Optional[dict] = None   # hasil /rf-analysis dari port 3001
 
 
 @asynccontextmanager
@@ -110,6 +112,40 @@ async def lifespan(app: FastAPI):
     else:
         logger.warning("Tidak ada data harga — pipeline tidak aktif.")
 
+
+    # ── FETCH RF PRODUCTION DATA ──────────────────────────────────────────────
+    # Ambil data dari RF API dan inject ke chatbot agar chatbot
+    # bisa menjawab pertanyaan produksi RBDPO via intent PRODUCTION.
+    # RF API harus sudah running sebelum api_stream.py dijalankan.
+    # Host & port dikontrol via env var RF_API_HOST / RF_API_PORT.
+    global _rf_cache
+    _rf_host = os.environ.get("RF_API_HOST", "localhost")
+    _rf_port = os.environ.get("RF_API_PORT", "3001")
+    _rf_url  = f"http://{_rf_host}:{_rf_port}/rf-analysis"
+    try:
+        import requests as _req
+        logger.info(f"Mengambil data RF production dari {_rf_url} ...")
+        _r = _req.get(_rf_url, timeout=60)
+        if _r.status_code == 200:
+            _rf_cache = _r.json()
+            n_bulan   = len(_rf_cache.get("historis", []))
+            if bot:
+                bot.set_rf_data(_rf_cache)
+            logger.info(
+                f"RF data berhasil dimuat: {n_bulan} bulan historis. "
+                f"Chatbot siap menjawab pertanyaan produksi RBDPO."
+            )
+        else:
+            logger.warning(
+                f"RF API merespons HTTP {_r.status_code}. "
+                f"Intent PRODUCTION tidak aktif."
+            )
+    except Exception as _e:
+        logger.warning(
+            f"RF API tidak dapat dijangkau ({_rf_url}): {_e}. "
+            f"Jalankan rf_api.py terlebih dahulu untuk mengaktifkan "
+            f"intent produksi pada chatbot."
+        )
 
     yield
     logger.info("Server shutting down.")
@@ -307,16 +343,24 @@ def get_status():
     """Cek status seluruh sistem."""
     chatbot_ok  = bot is not None
     pipeline_ok = cpo_pipeline is not None and cpo_pipeline.is_trained
+    rf_ok       = _rf_cache is not None
 
     return {
         "chatbot_ready"   : chatbot_ok,
         "pipeline_ready"  : pipeline_ok,
+        "rf_data_ready"   : rf_ok,
+        "rf_bulan_data"   : len(_rf_cache.get("historis", [])) if rf_ok else 0,
         "data_rows"       : len(bot.price_data) if chatbot_ok else 0,
         "input_features"  : cpo_pipeline.n_features if pipeline_ok else 0,
         "total_params"    : cpo_pipeline.total_params if pipeline_ok else 0,
         "metrics_available": cpo_pipeline.metrics is not None if pipeline_ok else False,
-        "message"         : "Sistem siap" if (chatbot_ok and pipeline_ok)
-                            else "Sistem belum sepenuhnya siap",
+        "message"         : (
+            "Sistem siap (LSTM + RF Production)"
+            if (chatbot_ok and pipeline_ok and rf_ok)
+            else "Sistem siap (RF Production tidak aktif)"
+            if (chatbot_ok and pipeline_ok)
+            else "Sistem belum sepenuhnya siap"
+        ),
     }
 
 
