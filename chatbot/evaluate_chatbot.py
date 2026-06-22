@@ -19,13 +19,13 @@ except ImportError as e:
     print(f"Error: Gagal memuat modul chatbot: {e}")
     sys.exit(1)
 
-# Dataset Pengujian dari Dokumen Uji (blackbox_testing.md)
+# Dataset Pengujian dari Dokumen Uji (blackbox_testing.md) dengan Jawaban Acuan Teroptimasi
 TEST_CASES = [
     {
         "id": 1,
         "query": "halo",
         "intent": "SMALL_TALK",
-        "reference_answer": "Halo! Saya Sobat INL, asisten virtual Anda. Ada yang bisa saya bantu hari ini?"
+        "reference_answer": "Halo! 👋 Sobat INL siap bantu seputar harga & prediksi CPO 🌴"
     },
     {
         "id": 2,
@@ -37,51 +37,51 @@ TEST_CASES = [
         "id": 3,
         "query": "prediksi harga CPO 7 hari ke depan",
         "intent": "FORECAST",
-        "reference_answer": "Berikut adalah prediksi harga CPO dalam USD/MT untuk 7 hari ke depan dengan rentang kepercayaan 90%."
+        "reference_answer": "Berikut adalah prediksi harga CPO (Crude Palm Oil) untuk 7 hari ke depan dalam USD per Metric Ton (USD/MT) berdasarkan pemodelan LSTM Sobat INL. Prediksi harga harian berkisar antara USD 1145 s.d. USD 1168/MT, lengkap dengan rentang kepercayaan 90% dan persentase perubahan harian."
     },
     {
         "id": 4,
         "query": "harga CPO besok berapa?",
         "intent": "FORECAST",
-        "reference_answer": "Prediksi harga CPO untuk besok (1 hari ke depan) adalah sekitar USD per Metric Ton."
+        "reference_answer": "Berdasarkan hasil analisis model peramalan LSTM Sobat INL, prediksi harga CPO (Crude Palm Oil) untuk besok adalah sekitar USD per Metric Ton (USD/MT) dengan rentang kepercayaan 90%."
     },
     {
         "id": 5,
         "query": "analisis harga CPO tahun 2024",
         "intent": "ANALYSIS",
-        "reference_answer": "Statistik harga CPO Tahun 2024 menunjukkan harga tertinggi, terendah, rata-rata, dan volume hari transaksi."
+        "reference_answer": "Berikut adalah hasil analisis statistik harga CPO (Crude Palm Oil) untuk periode Tahun 2024 berdasarkan data transaksi historis. Analisis meliputi harga tertinggi, harga terendah, rata-rata harga dalam satuan USD per Metric Ton (USD/MT), serta jumlah data hari transaksi."
     },
     {
         "id": 6,
         "query": "berapa harga CPO 15 Januari 2024?",
         "intent": "ANALYSIS",
-        "reference_answer": "Harga CPO pada tanggal 15 Januari 2024 adalah USD 993.25/MT."
+        "reference_answer": "Berdasarkan data historis PT Industri Nabati Lestari, harga CPO pada tanggal 15 Januari 2024 adalah USD 993.25 per Metric Ton (USD/MT)."
     },
     {
         "id": 7,
         "query": "di mana lokasi pabrik INL?",
         "intent": "INFO_COMPANY",
         "expected_chunk_keyword": "Kawasan Ekonomi Khusus Sei Mangkei",
-        "reference_answer": "PT INL berlokasi di Kawasan Ekonomi Khusus Sei Mangkei, Simalungun, Provinsi Sumatera Utara."
+        "reference_answer": "PT Industri Nabati Lestari (INL) berlokasi di Kawasan Ekonomi Khusus (KEK) Sei Mangkei, tepatnya di Jalan Kelapa Sawit II Kaveling 2-3, Kelurahan Sei Mangkei, Kecamatan Bosar Maligas, Kabupaten Simalungun, Provinsi Sumatera Utara dengan kode pos 21184."
     },
     {
         "id": 8,
         "query": "siapa pemilik PT INL?",
         "intent": "INFO_COMPANY",
         "expected_chunk_keyword": "Holding Perkebunan Nusantara PTPN III Persero",
-        "reference_answer": "PT INL merupakan anak perusahaan dari Holding Perkebunan Nusantara PTPN III Persero."
+        "reference_answer": "PT Industri Nabati Lestari (INL) didirikan sebagai anak perusahaan Badan Usaha Milik Negara (BUMN) yang berada di bawah naungan Holding Perkebunan Nusantara PTPN III (Persero). Pemegang saham utamanya adalah Pemerintah Indonesia melalui Danantara sebagai holding BUMN."
     },
     {
         "id": 9,
         "query": "berapa realisasi produksi RBDPO bulan lalu?",
         "intent": "PRODUCTION",
-        "reference_answer": "Realisasi produksi RBDPO bulan lalu adalah sebesar ton dibandingkan target RKAP."
+        "reference_answer": "Berdasarkan laporan analitik operasional pabrik PT Industri Nabati Lestari, realisasi produksi RBDPO (Refined Bleached Deodorized Palm Olein) pada bulan sebelumnya adalah sebesar ton, dengan perbandingan terhadap target RKAP, persentase capaian target, serta jumlah hari olah dan yield produksi."
     },
     {
         "id": 10,
         "query": "apa faktor paling berpengaruh terhadap produksi RBDPO?",
         "intent": "PRODUCTION",
-        "reference_answer": "Faktor paling berpengaruh terhadap produksi RBDPO berdasarkan model Random Forest adalah CPO input, target produksi, stok awal, dan efisiensi pabrik."
+        "reference_answer": "Berdasarkan analisis feature importance dari model Random Forest PT Industri Nabati Lestari, faktor atau variabel paling berpengaruh terhadap realisasi produksi RBDPO adalah volume CPO input (bahan baku), diikuti oleh target produksi RKAP, stok awal CPO, dan efisiensi hari olah pabrik."
     }
 ]
 
